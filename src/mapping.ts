@@ -1,22 +1,37 @@
-import { NewGravatar, UpdatedGravatar } from '../generated/Gravity/Gravity'
-import { Gravatar } from '../generated/schema'
+import { 
+  GoldLocked,
+  GoldUnlocked,
+  GoldRelocked,
+  GoldWithdrawn
+} from '../generated/LockedGold/LockedGold'
+import { Event } from '../generated/schema'
+import { log } from '@graphprotocol/graph-ts'
 
-export function handleNewGravatar(event: NewGravatar): void {
-  let gravatar = new Gravatar(event.params.id.toHex())
-  gravatar.owner = event.params.owner
-  gravatar.displayName = event.params.displayName
-  gravatar.imageUrl = event.params.imageUrl
-  gravatar.save()
+export function handleGoldLocked(event: GoldLocked): void {
+  let event_id = event.transaction.hash.toHex() + "-" + event.transactionLogIndex.toString() // unique id
+  let e = new Event(event_id)
+  e.address = event.address.toHex()
+  e.type = "GoldLocked"
+  e.data = GoldLockedJSON(event)
+  e.save();
 }
 
-export function handleUpdatedGravatar(event: UpdatedGravatar): void {
-  let id = event.params.id.toHex()
-  let gravatar = Gravatar.load(id)
-  if (gravatar == null) {
-    gravatar = new Gravatar(id)
-  }
-  gravatar.owner = event.params.owner
-  gravatar.displayName = event.params.displayName
-  gravatar.imageUrl = event.params.imageUrl
-  gravatar.save()
+export function handleGoldUnlocked(event: GoldUnlocked): void {
+  
+}
+
+export function handleGoldRelocked(event: GoldRelocked): void {
+  
+}
+
+export function handleGoldWithdrawn(event: GoldWithdrawn): void {
+  
+}
+
+export function GoldLockedJSON(event: GoldLocked): String {
+  let s = '{';
+  s+='\"account\": \"' + event.params.account.toHex().toString() +'\",'
+  s+='\"value\":' + event.params.value.toString()
+  s+= '}'
+  return s;
 }

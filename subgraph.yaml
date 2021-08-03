@@ -1,27 +1,26 @@
 specVersion: 0.0.2
-description: Gravatar for Ethereum
-repository: https://github.com/graphprotocol/example-subgraph
+description: Celo generic indexing (LockedGold)
+repository: https://github.com/teuul/celo-generic-exchange
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Gravity
-    network: mainnet
+    name: LockedGold
+    network: celo
     source:
-      address: '0x2E645469f354BB4F5c8a05B3b30A929361cf77eC'
-      abi: Gravity
+      address: '0x6cC083Aed9e3ebe302A6336dBC7c921C9f03349E'
+      abi: LockedGold
+      startBlock: 8012909
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Gravatar
+        - Event
       abis:
-        - name: Gravity
-          file: ./abis/Gravity.json
+        - name: LockedGold
+          file: ./abis/LockedGold.json
       eventHandlers:
-        - event: NewGravatar(uint256,address,string,string)
-          handler: handleNewGravatar
-        - event: UpdatedGravatar(uint256,address,string,string)
-          handler: handleUpdatedGravatar
+        - event: GoldLocked(indexed address,uint256)
+          handler: handleGoldLocked
       file: ./src/mapping.ts
