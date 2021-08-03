@@ -1,3 +1,3 @@
-# Example Subgraph
+# Celo LockedGold Subgraph
 
-An example to help you get started with The Graph. For more information see the docs on https://thegraph.com/docs/.
+Handles generically the data indexing of the Celo LockedGold smart contract
