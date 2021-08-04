@@ -3,16 +3,17 @@ import {
   GoldUnlocked,
   GoldRelocked,
   GoldWithdrawn
-} from '../generated/LockedGold/LockedGold'
-import { Event } from '../generated/schema'
-import { log } from '@graphprotocol/graph-ts'
+} from '../generated/LockedGold/LockedGold';
+import { Event, Field } from '../generated/schema';
+import { log, ethereum } from '@graphprotocol/graph-ts';
 
 export function handleGoldLocked(event: GoldLocked): void {
-  let event_id = event.transaction.hash.toHex() + "-" + event.transactionLogIndex.toString() // unique id
-  let e = new Event(event_id)
-  e.address = event.address.toHex()
-  e.type = "GoldLocked"
-  e.data = GoldLockedJSON(event)
+  let event_id = event.transaction.hash.toHex() + "-" + event.transactionLogIndex.toString(); // unique id
+  let e = new Event(event_id);
+  e.address = event.address.toHex();
+  e.type = "GoldLocked";
+  e.timestamp = event.block.timestamp;
+  createFieldData(event,event_id);
   e.save();
 }
 
@@ -28,10 +29,70 @@ export function handleGoldWithdrawn(event: GoldWithdrawn): void {
   
 }
 
-export function GoldLockedJSON(event: GoldLocked): String {
-  let s = '{';
-  s+='\"account\": \"' + event.params.account.toHex().toString() +'\",'
-  s+='\"value\":' + event.params.value.toString()
-  s+= '}'
-  return s;
+export function createFieldData(event: GoldLocked, event_id: String): void{
+  for(let i=0;i<event.parameters.length;i++){
+    let field = new Field(event_id + "-" + i.toString());
+    field.name = event.parameters[i].name;
+    field.event = event_id.toString(); // toString ?
+    field.type = getKindString(event.parameters[i].value);
+    field.value = getValueString(event.parameters[i].value);
+    field.save();
+  }
+}
+
+export function getKindString(value: ethereum.Value): string {
+  switch(value.kind){
+    case(0):
+      return 'ADDRESS';
+    case(1):
+      return 'FIXED_BYTES';
+    case(2):
+      return 'BYTES';
+    case(3):
+      return 'INT';
+    case(4):
+      return 'UINT';
+    case(5):
+      return 'BOOL';
+    case(6):
+      return 'STRING';
+    case(7):
+      return 'FIXED_ARRAY'; // not tested
+    case(8):
+      return 'ARRAY'; // not tested
+    case(9):
+      return 'TUPLE'; // not tested
+    default:
+      return 'NONE';
+  }
+}
+
+export function getValueString(value: ethereum.Value): string {
+  switch(value.kind){
+    case(0):
+      return value.toAddress().toHex().toString();
+    case(1):
+      return value.toBytes().toString();
+    case(2):
+      return value.toBytes().toString();
+    case(3):
+      return value.toBigInt().toString();
+    case(4):
+      return value.toBigInt().toString();
+    case(5):
+      if(value.toBoolean()==true)
+        return 'true';
+      else
+        return 'false';
+    case(6):
+      return value.toString();
+    case(7):
+      return value.toArray().toString();
+    case(8):
+      return value.toArray().toString();
+    case(9):
+      return value.toTuple().toString();
+    default:
+      return 'NONE';
+  }
 }
