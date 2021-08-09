@@ -2,12 +2,12 @@
   "name": "celo-lockedgold",
   "version": "0.1.0",
   "scripts": {
-    "create": "graph create teuul/celo-lockedgold --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create teuul/celo-lockedgold --node http://127.0.0.1:8020",
+    "create": "graph create teuul/celo-research-three --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create teuul/celo-research-three --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy teuul/celo-lockedgold --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy teuul/celo-lockedgold --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy": "graph deploy teuul/celo-research-three --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy-local": "graph deploy teuul/celo-research-three --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.20.1",
