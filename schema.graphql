@@ -1,18 +1,10 @@
-type _Schema_
-  @fulltext(
-    name: "entitySearch"
-    language: en
-    algorithm: rank
-    include: [{ entity: "Event", fields: [{name: "type"}] }]
-  )
- 
-
 type Event @entity {
   id: ID!
   address: String!
   type: String!
   timestamp: BigInt!
   data: [Field!] @derivedFrom(field: "event")
+  arraydata:[ArrayField!] @derivedFrom(field: "event")
 }
 
 type Field @entity {
@@ -21,4 +13,18 @@ type Field @entity {
   type: String!
   value: String!
   event: Event!
+}
+
+type ArrayField @entity {
+  id: ID!
+  name: String!
+  data: [Item!] @derivedFrom(field: "array")
+  event: Event!
+}
+
+type Item @entity {
+  id: ID!
+  value: String!
+  type: String!
+  array: ArrayField!
 }

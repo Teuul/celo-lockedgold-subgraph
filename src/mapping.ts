@@ -4,7 +4,7 @@ import {
   GoldRelocked,
   GoldWithdrawn
 } from '../generated/LockedGold/LockedGold';
-import { Event, Field } from '../generated/schema';
+import { Event, Field, ArrayField, Item } from '../generated/schema';
 import { log, ethereum } from '@graphprotocol/graph-ts';
 
 export function handleGoldLocked(event: GoldLocked): void {
@@ -13,7 +13,7 @@ export function handleGoldLocked(event: GoldLocked): void {
   e.address = event.address.toHex();
   e.type = "GoldLocked";
   e.timestamp = event.block.timestamp;
-  createFieldData(event,event_id);
+  createData(event,event_id);
   e.save();
 }
 
@@ -29,14 +29,30 @@ export function handleGoldWithdrawn(event: GoldWithdrawn): void {
   
 }
 
-export function createFieldData(event: GoldLocked, event_id: String): void{
-  for(let i=0;i<event.parameters.length;i++){
-    let field = new Field(event_id + "-" + i.toString());
-    field.name = event.parameters[i].name;
-    field.event = event_id.toString(); // toString ?
-    field.type = getKindString(event.parameters[i].value);
-    field.value = getValueString(event.parameters[i].value);
-    field.save();
+export function createData(event: ethereum.Event, event_id: String): void {
+  for (let i=0;i<event.parameters.length;i++) {
+    if (event.parameters[i].value.kind<7) {
+      let field = new Field(event_id + "-" + i.toString());
+      field.name = event.parameters[i].name;
+      field.event = event_id.toString();
+      field.type = getKindString(event.parameters[i].value);
+      field.value = getValueString(event.parameters[i].value);
+      field.save();
+    } else if (event.parameters[i].value.kind==8) {
+      let array = new ArrayField(event_id + '-' + i.toString());
+      array.name = event.parameters[i].name;
+      array.event = event_id.toString();
+      let aux = event.parameters[i].value.toArray();
+      for (let j=0;j<aux.length;j++) {
+        let item = new Item(event_id + "-" + i.toString() + '-' + j.toString());
+        item.type = getKindString(aux[j]);
+        item.value = getValueString(aux[j]);
+        item.array = array.id;
+        item.save();
+      } array.save();
+    } else {
+      log.error('__ERROR__: TUPLES NOT HANDLED',[]);
+    }
   }
 }
 
@@ -57,9 +73,9 @@ export function getKindString(value: ethereum.Value): string {
     case(6):
       return 'STRING';
     case(7):
-      return 'FIXED_ARRAY'; // not tested
+      return 'FIXED_ARRAY';
     case(8):
-      return 'ARRAY'; // not tested
+      return 'ARRAY';
     case(9):
       return 'TUPLE'; // not tested
     default:
@@ -87,11 +103,11 @@ export function getValueString(value: ethereum.Value): string {
     case(6):
       return value.toString();
     case(7):
-      return value.toArray().toString();
+      return value.toArray().toString(); // not used
     case(8):
-      return value.toArray().toString();
+      return value.toArray().toString(); // not used
     case(9):
-      return value.toTuple().toString();
+      return value.toTuple().toString(); // not handled
     default:
       return 'NONE';
   }

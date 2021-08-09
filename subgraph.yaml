@@ -18,6 +18,8 @@ dataSources:
       entities:
         - Event
         - Field
+        - ArrayField
+        - Item
       abis:
         - name: LockedGold
           file: ./abis/LockedGold.json
