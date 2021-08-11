@@ -3,6 +3,8 @@ type Event @entity {
   address: String!
   type: String!
   timestamp: BigInt!
+  blockNumber: BigInt!
+  stakeholders: [String!]
   data: [Field!] @derivedFrom(field: "event")
   arraydata:[ArrayField!] @derivedFrom(field: "event")
 }
