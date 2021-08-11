@@ -6,13 +6,21 @@ export function handleEvent(event: ethereum.Event, eventName: string): void {
   let e = new Event(event_id);
   e.address = event.address.toHex();
   e.type = eventName;
+  e.stakeholders = [e.address];
   e.timestamp = event.block.timestamp;
-  createData(event,event_id);
+  e.blockNumber = event.block.number;
+  createData(event,event_id,e);
   e.save();
 }
 
-export function createData(event: ethereum.Event, event_id: String): void {
+export function createData(event: ethereum.Event, event_id: String, event_entity: Event): void {
   for (let i=0;i<event.parameters.length;i++) {
+    if (event.parameters[i].value.kind==0) {
+      log.debug("__DEBUG__ address typed parameter found: ",[]);
+      let aux = event_entity.stakeholders;
+      aux.push(getValueString(event.parameters[i].value));
+      event_entity.stakeholders = aux;
+    }
     if (event.parameters[i].value.kind<7) {
       let field = new Field(event_id + "-" + i.toString());
       field.name = event.parameters[i].name;
