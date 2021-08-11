@@ -26,4 +26,10 @@ dataSources:
       eventHandlers:
         - event: GoldLocked(indexed address,uint256)
           handler: handleGoldLocked
+        - event: GoldUnlocked(indexed address,uint256,uint256)
+          handler: handleGoldUnlocked
+        - event: GoldRelocked(indexed address,uint256)
+          handler: handleGoldRelocked
+        - event: GoldWithdrawn(indexed address,uint256)
+          handler: handleGoldWithdrawn
       file: ./src/mapping.ts
